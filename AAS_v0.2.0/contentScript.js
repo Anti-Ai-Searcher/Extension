@@ -1,5 +1,5 @@
 (function () {
-  // 이미 생성된 UI가 있다면 중단
+  // 이미 UI가 있으면 중단
   if (document.querySelector(".my-ext-container")) {
     return;
   }
@@ -20,8 +20,9 @@
 
   const title = document.createElement("div");
   title.className = "my-ext-title";
-  title.textContent = "Anti-AI-Searcher"; // 원하는 제목
+  title.textContent = "Anti-AI-Searcher";
 
+  // 전체 다운로드 버튼
   const downloadAllBtn = document.createElement("button");
   downloadAllBtn.className = "my-ext-button";
   downloadAllBtn.textContent = "전체 링크 다운로드";
@@ -36,6 +37,7 @@
   // 좌측 칼럼
   const leftCol = document.createElement("div");
   leftCol.className = "my-ext-column";
+
   const leftColHeader = document.createElement("div");
   leftColHeader.className = "my-ext-col-header";
 
@@ -54,6 +56,7 @@
   // 우측 칼럼
   const rightCol = document.createElement("div");
   rightCol.className = "my-ext-column";
+
   const rightColHeader = document.createElement("div");
   rightColHeader.className = "my-ext-col-header";
 
@@ -69,7 +72,7 @@
   rightColHeader.appendChild(downloadRightBtn);
   rightCol.appendChild(rightColHeader);
 
-  // 래퍼에 삽입
+  // 4) 래퍼에 좌/우 칼럼 삽입
   columnsWrapper.appendChild(leftCol);
   columnsWrapper.appendChild(rightCol);
 
@@ -77,36 +80,55 @@
   extContainer.appendChild(header);
   extContainer.appendChild(columnsWrapper);
 
-  // 구글 검색 영역 최상단에 삽입
+  // 5) 구글 검색 영역 최상단에 삽입
   searchArea.insertAdjacentElement("afterbegin", extContainer);
 
-  // (예시) 모든 a 태그 -> 짝수/홀수 분류
+  // 6) 모든 a 태그를 수집 -> 필터 -> 짝수/홀수 분류
   const allAnchorTags = Array.from(document.querySelectorAll("a"));
-  const allLinks = allAnchorTags.map((a) => a.href).filter((href) => href);
+  // 6-1) href 추출
+  let allLinks = allAnchorTags.map((a) => a.href).filter((href) => href);
 
+  // 6-2) "google" 단어가 들어간 url은 제외
+  //      대소문자 구분 없이 처리: toLowerCase() 후 "google" 포함 검사
+  allLinks = allLinks.filter((link) => !link.toLowerCase().includes("google"));
+
+  // 7) 짝수 인덱스 -> AI, 홀수 인덱스 -> Human
   const aiLinks = [];
   const humanLinks = [];
   allLinks.forEach((link, idx) => {
-    if (idx % 2 === 0) aiLinks.push(link);
-    else humanLinks.push(link);
+    if (idx % 2 === 0) {
+      aiLinks.push(link);
+    } else {
+      humanLinks.push(link);
+    }
   });
 
-  // 링크 표시 함수
+  // 8) UI에 링크 표시 (하이퍼링크로 표시)
   function appendLinksToColumn(links, col) {
     links.forEach((l) => {
-      const linkEl = document.createElement("div");
-      linkEl.className = "my-ext-link";
-      linkEl.textContent = l;
-      col.appendChild(linkEl);
+      // 링크 박스
+      const linkBox = document.createElement("div");
+      linkBox.className = "my-ext-link";
+
+      // 실제 하이퍼링크 (누르면 이동)
+      const anchor = document.createElement("a");
+      anchor.href = l;
+      anchor.target = "_blank"; // 새 탭에서 열기
+      anchor.innerText = l; // 보여주는 텍스트
+      anchor.className = "my-link-anchor"; // CSS 호버 스타일을 위해
+
+      linkBox.appendChild(anchor);
+      col.appendChild(linkBox);
     });
   }
 
   appendLinksToColumn(aiLinks, leftCol);
   appendLinksToColumn(humanLinks, rightCol);
 
-  // 다운로드 헬퍼
-  function downloadJSON(filename, dataObj) {
-    const dataStr = JSON.stringify(dataObj, null, 2);
+  // 9) 다운로드 헬퍼
+  function downloadJSON(filename, dataArr) {
+    // dataArr에는 이미 google 제외된 링크가 들어 있음
+    const dataStr = JSON.stringify(dataArr, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -118,7 +140,7 @@
     URL.revokeObjectURL(url);
   }
 
-  // 이벤트
+  // 10) 다운로드 버튼 이벤트
   downloadAllBtn.addEventListener("click", () => {
     downloadJSON("allLinks.json", allLinks);
   });

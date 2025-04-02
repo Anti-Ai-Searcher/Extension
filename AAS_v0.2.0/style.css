@@ -74,6 +74,18 @@
   word-wrap: break-word;
   overflow-wrap: anywhere;
   color: #202124;
+  /* 아래 줄은 optional: 커서 올리면 미세하게 색 변경 */
+}
+.my-ext-link:hover {
+  background-color: #5f6368; /* 박스 전체 배경 약간 연하게 바뀜 */
+}
+
+/* 하이퍼링크 텍스트 스타일 */
+.my-link-anchor {
+  text-decoration: none;
+}
+.my-link-anchor:hover {
+  text-decoration: underline; /* 호버 시 밑줄 표시 */
 }
 
 /* 버튼 */
@@ -87,7 +99,8 @@
   color: #202124;
 }
 .my-ext-button:hover {
-  background-color: #dadce0;
+  color: #000;
+  background-color: lightgreen;
 }
 
 /* 다크 모드 */
@@ -115,7 +128,8 @@
     color: #e8eaed;
   }
   .my-ext-button:hover {
-    background-color: #5f6368;
+    color: #000;
+    background-color: lightgreen;
   }
   .my-ext-columns {
     border-top: 1px solid #5f6368;
