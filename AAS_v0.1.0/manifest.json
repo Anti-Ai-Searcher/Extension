@@ -1,7 +1,7 @@
 {
     "name": "Anti-AI-Searcher",
     "description": "Detect and separate AI-generated and human-generated links in search results.",
-    "version": "1.0",
+    "version": "0.1.0",
     "manifest_version": 3,
   
     "permissions": [
