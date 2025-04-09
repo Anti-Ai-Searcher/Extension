@@ -1,0 +1,182 @@
+.my-ext-container {
+  margin: 12px auto; /* 위/아래 12px, 좌/우 자동 중앙 정렬 */
+  width: 90%; /* 화면 폭의 90% 차지 -> 남는 여백 최소화 */
+  background-color: #fff;
+  color: #202124;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  padding: 12px; /* 내부 여백도 12px (기존 16px에서 축소) */
+}
+
+/* 상단 헤더 */
+.my-ext-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* 조금만 띄움 */
+}
+
+.my-ext-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+}
+
+/* 좌우 칼럼 래퍼 */
+.my-ext-columns {
+  display: flex;
+  gap: 10px; /* 칼럼 사이 간격 줄임 */
+  margin-top: 8px;
+  flex-wrap: wrap; /* 폭이 좁으면 줄바꿈 */
+  border-top: 1px solid #dadce0;
+  padding-top: 10px;
+  box-sizing: border-box;
+}
+
+/* 칼럼 */
+.my-ext-column {
+  flex: 1 1 0;
+  min-width: 0;
+  border-right: 1px solid #dadce0;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.my-ext-column:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+/* 칼럼 헤더 (소제목 + 버튼) */
+.my-ext-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.my-ext-col-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 링크 박스 */
+.my-ext-link {
+  background-color: #f1f3f4;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  color: #202124;
+  /* 아래 줄은 optional: 커서 올리면 미세하게 색 변경 */
+}
+.my-ext-link:hover {
+  background-color: #5f6368; /* 박스 전체 배경 약간 연하게 바뀜 */
+}
+
+/* 하이퍼링크 텍스트 스타일 */
+.my-link-anchor {
+  text-decoration: none;
+}
+.my-link-anchor:hover {
+  text-decoration: underline; /* 호버 시 밑줄 표시 */
+}
+
+/* 버튼 */
+.my-ext-button {
+  background-color: #f8f9fa;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #202124;
+}
+.my-ext-button:hover {
+  color: #000;
+  background-color: lightgreen;
+}
+
+.my-ext-tabs {
+  display: flex;
+  border-bottom: 1px solid #dadce0;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.my-ext-tab-button {
+  flex: 1;
+  padding: 8px;
+  background-color: #f1f3f4;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #202124;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.my-ext-tab-button:not(:last-child) {
+  border-right: 1px solid #dadce0;
+}
+
+.my-ext-tab-button.active {
+  background-color: #ffffff;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.my-ext-tab-button:hover {
+  background-color: #e8eaed;
+}
+
+.my-ext-content-area {
+  padding: 8px 0;
+}
+
+.my-ext-tab-content {
+  display: none;
+}
+
+.my-ext-tab-content.active {
+  display: block;
+}
+
+/* 다크 모드 */
+@media (prefers-color-scheme: dark) {
+  .my-ext-container {
+    background-color: #202124;
+    color: #e8eaed;
+    border-color: #5f6368;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+  }
+  .my-ext-title {
+    color: #e8eaed;
+  }
+  .my-ext-column {
+    border-right: 1px solid #3c4043;
+  }
+  .my-ext-link {
+    background-color: #303134;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+  .my-ext-button {
+    background-color: #3c4043;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+  .my-ext-button:hover {
+    color: #000;
+    background-color: lightgreen;
+  }
+  .my-ext-columns {
+    border-top: 1px solid #5f6368;
+  }
+}
