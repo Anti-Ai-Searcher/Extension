@@ -1,5 +1,8 @@
 .my-ext-container {
-  margin: 12px auto; /* 위/아래 12px, 좌/우 자동 중앙 정렬 */
+  margin-top: 10px;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
   width: 90%; /* 화면 폭의 90% 차지 -> 남는 여백 최소화 */
   background-color: #fff;
   color: #202124;
@@ -137,7 +140,7 @@
 }
 
 .my-ext-content-area {
-  padding: 8px 0;
+  padding-top: 8px;
 }
 
 .my-ext-tab-content {
