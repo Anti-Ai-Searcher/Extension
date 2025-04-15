@@ -156,8 +156,6 @@
   // 확률별 배경/글자색 설정 함수
   function setProbabilityStyle(prob, element) {
     // prob: 0~100
-    // 0~20, 20~40, 40~60 => 배경: (green, #85cc00, yellow), 글자색: 검정
-    // 60~80, 80~100 => 배경: (orange, red), 글자색: 흰색
 
     if (prob <= 20) {
       element.style.backgroundColor = "green";
@@ -170,7 +168,7 @@
       element.style.color = "#000";
     } else if (prob <= 80) {
       element.style.backgroundColor = "orange";
-      element.style.color = "#fff";
+      element.style.color = "#000";
     } else {
       element.style.backgroundColor = "red";
       element.style.color = "#fff";
