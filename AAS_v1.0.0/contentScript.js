@@ -70,7 +70,9 @@
   let allLinks = allAnchorTags
     .map((a) => a.href)
     .filter((href) => href && !href.toLowerCase().includes("google"))
-    .filter((href) => href && !href.toLowerCase().includes("youtube.com")); // 유튜브 링크 밴
+    .filter((href) => href && !href.toLowerCase().includes("youtube.com")) // 유튜브 링크 밴
+    .filter((href) => href && !href.toLowerCase().includes("wiki")); // 나무위키, 위키피디아 밴
+
   console.log(allLinks);
 
   // 서버 주소
