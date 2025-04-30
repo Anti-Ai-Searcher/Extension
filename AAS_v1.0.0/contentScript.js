@@ -69,7 +69,8 @@
   const allAnchorTags = Array.from(document.querySelectorAll("a"));
   let allLinks = allAnchorTags
     .map((a) => a.href)
-    .filter((href) => href && !href.toLowerCase().includes("google"));
+    .filter((href) => href && !href.toLowerCase().includes("google"))
+    .filter((href) => href && !href.toLowerCase().includes("youtube.com")); // 유튜브 링크 밴
   console.log(allLinks);
 
   // 서버 주소
