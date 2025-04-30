@@ -70,89 +70,104 @@
   let allLinks = allAnchorTags
     .map((a) => a.href)
     .filter((href) => href && !href.toLowerCase().includes("google"));
-
-  // 2) 서버에 보낼 JSON
-  const payload = { links: allLinks };
+  console.log(allLinks);
 
   // 서버 주소
-  const SERVER_URL = "http://127.0.0.1:8000/check_ai";
+  const SERVER_URL = "http://localhost:8000/check_ai/";
 
-  // 3) 서버 POST
-  fetch(SERVER_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (!data.results) {
-        aiContent.innerHTML = "<div>결과 포맷이 올바르지 않습니다.</div>";
-        console.error("결과 포맷이 이상함:", data);
-        return;
+  // 2) 서버 POST
+  // 5개씩 쪼개기 함수 정의 // 수정됨
+  function chunkArray(array, size) {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  }
+
+  const chunks = chunkArray(allLinks, 5); // 수정됨
+  var flag_AI = 0;
+  var flag_Human = 0;
+
+  // UI 초기화 // 수정됨
+  aiContent.innerHTML = "결과를 입력 받는 중입니다.."; // 수정됨
+  humanContent.innerHTML = "결과를 입력 받는 중입니다.."; // 수정됨
+  
+  // 순차적으로 요청 처리하는 비동기 함수 // 수정됨
+  (async () => {
+    for (const chunk of chunks) { // 수정됨
+      const payload = { links: chunk }; // 수정됨
+
+      try {
+        const res = await fetch(SERVER_URL, { // 수정됨
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (!data.results) {
+          console.error("결과 포맷이 이상함:", data);
+          continue; // 수정됨
+        }
+
+        data.results.forEach((item) => {
+          const url = item.url;
+          const aiProbRaw = item.ai_probability;
+
+          const linkBox = document.createElement("div");
+          linkBox.className = "my-ext-link";
+
+          const leftPart = document.createElement("div");
+          leftPart.className = "link-left";
+          const anchor = document.createElement("a");
+          anchor.className = "my-link-anchor";
+          anchor.href = url;
+          anchor.target = "_blank";
+          anchor.innerText = url;
+          leftPart.appendChild(anchor);
+
+          const rightPart = document.createElement("div");
+          rightPart.className = "link-right";
+
+          if (typeof aiProbRaw !== "number") {
+            rightPart.textContent = `오류: ${aiProbRaw}`; // 수정됨
+          } else {
+            const aiProbPercent = (aiProbRaw * 100).toFixed(2);
+            rightPart.textContent = `AI 확률: ${aiProbPercent}%`; // 수정됨
+            setProbabilityStyle(Number(aiProbPercent), rightPart); // 수정됨
+          }
+
+          linkBox.appendChild(leftPart);
+          linkBox.appendChild(rightPart);
+
+          if (typeof aiProbRaw === "number" && aiProbRaw > 0.6) {
+            if (flag_AI === 0) {
+              aiContent.innerHTML = ""; // 수정됨
+              flag_AI = 1; // 수정됨
+            }
+            aiContent.appendChild(linkBox); // 수정됨
+          } else {
+            if (flag_Human === 0) {
+              humanContent.innerHTML = ""; // 수정됨
+              flag_Human = 1; // 수정됨
+            }
+            humanContent.appendChild(linkBox); // 수정됨
+          }
+        });
+
+      } catch (err) {
+        console.error("[Extension] 서버 요청 실패:", err); // 수정됨
       }
-
-      // 안내 문구 제거
-      aiContent.innerHTML = "";
-      humanContent.innerHTML = "";
-
-      data.results.forEach((item) => {
-        const url = item.url;
-        const aiProbRaw = item.ai_probability;
-
-        // 크롤링 실패나 판별 실패 처리
-        if (typeof aiProbRaw !== "number") {
-          const failBox = document.createElement("div");
-          failBox.className = "my-ext-link";
-          failBox.textContent = `${url} | 오류: ${aiProbRaw}`;
-          humanContent.appendChild(failBox);
-          return;
-        }
-
-        // AI 확률(0~1) → 백분율
-        const aiProbPercent = (aiProbRaw * 100).toFixed(2);
-        const isAILink = aiProbRaw > 0.6; // 60% 기준
-
-        // 전체 박스
-        const linkBox = document.createElement("div");
-        linkBox.className = "my-ext-link";
-
-        // 왼쪽: 링크 부분
-        const leftPart = document.createElement("div");
-        leftPart.className = "link-left";
-
-        const anchor = document.createElement("a");
-        anchor.className = "my-link-anchor";
-        anchor.href = url;
-        anchor.target = "_blank";
-        anchor.innerText = url;
-        leftPart.appendChild(anchor);
-
-        // 오른쪽: 확률 박스
-        const rightPart = document.createElement("div");
-        rightPart.className = "link-right";
-        rightPart.textContent = `AI 확률: ${aiProbPercent}%`;
-
-        // 확률별 배경/글자색 설정
-        setProbabilityStyle(Number(aiProbPercent), rightPart);
-
-        // 조립
-        linkBox.appendChild(leftPart);
-        linkBox.appendChild(rightPart);
-
-        // 탭 분류
-        if (isAILink) {
-          aiContent.appendChild(linkBox);
-        } else {
-          humanContent.appendChild(linkBox);
-        }
-      });
-    })
-    .catch((err) => {
-      console.error("[Extension] 서버 요청 실패:", err);
-      aiContent.innerHTML = "<div>서버 요청 실패</div>";
-      humanContent.innerHTML = "";
-    });
-
+    }
+    if(flag_AI === 0) {
+      aiContent.innerHTML = "AI가 생성한 콘테츠가 없습니다.";
+    }
+    if(flag_Human === 0) {
+      humanContent.innerHTML = "사람이 생성한 콘텐츠가 없습니다.";
+    }
+  })(); // 수정됨
+  
   // 확률별 배경/글자색 설정 함수
   function setProbabilityStyle(prob, element) {
     // prob: 0~100
