@@ -79,7 +79,7 @@
   const SERVER_URL = "http://localhost:8000/check_ai/";
 
   // 2) 서버 POST
-  // 5개씩 쪼개기 함수 정의 // 수정됨
+  // 5개씩 쪼개기 함수 정의 
   function chunkArray(array, size) {
     const chunks = [];
     for (let i = 0; i < array.length; i += size) {
@@ -88,21 +88,21 @@
     return chunks;
   }
 
-  const chunks = chunkArray(allLinks, 5); // 수정됨
+  const chunks = chunkArray(allLinks, 5); 
   var flag_AI = 0;
   var flag_Human = 0;
 
-  // UI 초기화 // 수정됨
-  aiContent.innerHTML = "결과를 입력 받는 중입니다.."; // 수정됨
-  humanContent.innerHTML = "결과를 입력 받는 중입니다.."; // 수정됨
+  // UI 초기화 
+  aiContent.innerHTML = "결과를 입력 받는 중입니다.."; 
+  humanContent.innerHTML = "결과를 입력 받는 중입니다.."; 
   
-  // 순차적으로 요청 처리하는 비동기 함수 // 수정됨
+  // 순차적으로 요청 처리하는 비동기 함수 
   (async () => {
-    for (const chunk of chunks) { // 수정됨
-      const payload = { links: chunk }; // 수정됨
+    for (const chunk of chunks) { 
+      const payload = { links: chunk }; 
 
       try {
-        const res = await fetch(SERVER_URL, { // 수정됨
+        const res = await fetch(SERVER_URL, { 
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -111,7 +111,7 @@
 
         if (!data.results) {
           console.error("결과 포맷이 이상함:", data);
-          continue; // 수정됨
+          continue; 
         }
 
         data.results.forEach((item) => {
@@ -134,11 +134,11 @@
           rightPart.className = "link-right";
 
           if (typeof aiProbRaw !== "number") {
-            rightPart.textContent = `오류: ${aiProbRaw}`; // 수정됨
+            rightPart.textContent = `오류: ${aiProbRaw}`; 
           } else {
             const aiProbPercent = (aiProbRaw * 100).toFixed(2);
-            rightPart.textContent = `AI 확률: ${aiProbPercent}%`; // 수정됨
-            setProbabilityStyle(Number(aiProbPercent), rightPart); // 수정됨
+            rightPart.textContent = `AI 확률: ${aiProbPercent}%`; 
+            setProbabilityStyle(Number(aiProbPercent), rightPart); 
           }
 
           linkBox.appendChild(leftPart);
@@ -146,21 +146,21 @@
 
           if (typeof aiProbRaw === "number" && aiProbRaw > 0.6) {
             if (flag_AI === 0) {
-              aiContent.innerHTML = ""; // 수정됨
-              flag_AI = 1; // 수정됨
+              aiContent.innerHTML = ""; 
+              flag_AI = 1; 
             }
-            aiContent.appendChild(linkBox); // 수정됨
+            aiContent.appendChild(linkBox); 
           } else {
             if (flag_Human === 0) {
-              humanContent.innerHTML = ""; // 수정됨
-              flag_Human = 1; // 수정됨
+              humanContent.innerHTML = ""; 
+              flag_Human = 1; 
             }
-            humanContent.appendChild(linkBox); // 수정됨
+            humanContent.appendChild(linkBox); 
           }
         });
 
       } catch (err) {
-        console.error("[Extension] 서버 요청 실패:", err); // 수정됨
+        console.error("[Extension] 서버 요청 실패:", err); 
       }
     }
     if(flag_AI === 0) {
@@ -169,7 +169,7 @@
     if(flag_Human === 0) {
       humanContent.innerHTML = "사람이 생성한 콘텐츠가 없습니다.";
     }
-  })(); // 수정됨
+  })(); 
   
   // 확률별 배경/글자색 설정 함수
   function setProbabilityStyle(prob, element) {

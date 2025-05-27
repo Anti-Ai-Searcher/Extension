@@ -1,0 +1,27 @@
+{
+  "name": "Anti-AI-Searcher",
+  "version": "2.0.0",
+  "manifest_version": 3,
+  "description": "Google 검색 결과를 AI로 분석하고, 검색 카드 우하단에 AI 분석 결과를 퍼센트로 표시합니다.",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["http://127.0.0.1:8000/*"],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.google.com/search=*"
+      ],
+      "js": ["contentScript.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "images/AAS_icon-16.png",
+    "32": "images/AAS_icon-32.png",
+    "48": "images/AAS_icon-48.png",
+    "128": "images/AAS_icon-128.png"
+  }
+}
