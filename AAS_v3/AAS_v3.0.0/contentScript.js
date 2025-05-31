@@ -8,12 +8,18 @@
   st.textContent = `
     .aas-tabbar{display:flex;width:100%;border:1px solid #dadce0;border-radius:4px;
       overflow:hidden;margin:12px 0;font-family:Arial,Helvetica,sans-serif}
+
     .aas-tab{flex:1;padding:8px 0;background:#f1f3f4;color:#555;text-align:center;
       font-size:14px;font-weight:500;cursor:pointer;border-right:1px solid #dadce0}
+
     .aas-tab:last-child{border-right:none}.aas-tab.active{background:#fff;color:#1a73e8;font-weight:600}
+
     .aas-loading{margin:8px 0;font-size:14px;color:#555;font-family:Arial,Helvetica,sans-serif}
-    body.aas-show-human .aas-card.aas-ai{display:none!important}
-    body.aas-show-ai    .aas-card.aas-human{display:none!important}
+
+    body.aas-screen-ai .aas-card.aas-ai{display:none!important}
+
+    body.aas-screen-human    .aas-card.aas-human{display:none!important}
+
     .ai-badge{position:absolute;right:8px;bottom:8px;padding:2px 6px;border-radius:4px;
       font-size:12px;font-weight:600;z-index:50}
   `;
@@ -23,7 +29,7 @@
   const bar = document.createElement("div");
   bar.className = "aas-tabbar";
 
-  const tT = Object.assign(document.createElement("div"), {className:"aas-tab active",textContent:"전체"})
+  const tT = Object.assign(document.createElement("div"), {className:"aas-tab active",textContent:"Total Links"})
   const tH = Object.assign(document.createElement("div"), {className:"aas-tab",textContent:"Human Links"});
   const tA = Object.assign(document.createElement("div"), {className:"aas-tab",textContent:"AI Links"});
   bar.append(tT,tH,tA);
@@ -35,23 +41,22 @@
   const parent = search?.parentElement||document.body;
   parent.insertBefore(loading, search);
   parent.insertBefore(bar, search);
+
   function activateTab(tab) {
     tT.classList.remove("active");
     tH.classList.remove("active");
     tA.classList.remove("active");
     tab.classList.add("active");
-    document.body.classList.remove("aas-show-human", "aas-show-ai");
-    if (tab === tT) {
-      document.body.classList.add("aas-show-human");
-      document.body.classList.add("aas-show-ai");
-    } else if (tab === tH) {
-      document.body.classList.add("aas-show-human");
+
+    document.body.classList.remove("aas-screen-human", "aas-screen-ai");
+    if (tab === tH) {
+      document.body.classList.add("aas-screen-ai");
     } else if (tab === tA) {
-      document.body.classList.add("aas-show-ai");
+      document.body.classList.add("aas-screen-human");
     }
   }
   
-  document.body.classList.add("aas-show-human");
+  /* default to showing all links */
   tT.onclick=()=>{activateTab(tT);};
   tH.onclick=()=>{activateTab(tH);};
   tA.onclick=()=>{activateTab(tA);};
