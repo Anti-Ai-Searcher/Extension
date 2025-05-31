@@ -1,7 +1,7 @@
 // background.js  – Manifest V3 service-worker
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    // contentScript 가 {type:"CHECK_AI", links:[…]} 형태로 보냄
+    // contentScript sends {type:"CHECK_AI", links:[…]}
     if (msg?.type !== "CHECK_AI" || !Array.isArray(msg.links)) return;
   
     fetch("http://127.0.0.1:8000/check_ai", {

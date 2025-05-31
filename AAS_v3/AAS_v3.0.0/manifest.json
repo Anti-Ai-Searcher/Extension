@@ -21,9 +21,14 @@
     }
   ],
   "icons": {
-    "16": "images/AAS_icon-16.png",
-    "32": "images/AAS_icon-32.png",
-    "48": "images/AAS_icon-48.png",
-    "128": "images/AAS_icon-128.png"
+    "16": "statics/img/AAS_icon-16.png",
+    "32": "statics/img/AAS_icon-32.png",
+    "48": "statics/img/AAS_icon-48.png",
+    "128": "statics/img/AAS_icon-128.png"
+  },
+  "options_ui" : {
+    "page": "templates/options.html",
+    "open_in_tab": true,
+    "browser_style": true
   }
 }

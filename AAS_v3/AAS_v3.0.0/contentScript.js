@@ -1,7 +1,30 @@
-// == Anti-AI-Searcher : contentScript (final with error handling) ==
+// == Anti-AI-Searcher : contentScript ==
+// writer: @jaechan
+// version: 3.0.0
+
 (function () {
   if (window.__aasInjected) return;
   window.__aasInjected = true;
+
+  /* 0. Importing Settings */
+  const defaultSettings = {
+    aiJudge: 60, // Default AI probability threshold
+  };
+  function loadSettings() {
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      return new Promise((resolve) => {
+        chrome.storage.sync.get(defaultSettings, (settings) => {
+          resolve(settings);
+        });
+      });
+    } else {
+      // Fallback for testing without Chrome extension
+      const saved = localStorage.getItem('extensionSettings');
+      const settings = saved ? JSON.parse(saved) : defaultSettings;
+      return Promise.resolve(settings);
+    }
+  }
+  
 
   /* 1. CSS */
   const st = document.createElement("style");
@@ -25,7 +48,7 @@
   `;
   document.head.appendChild(st);
 
-  /* 2. 탭 & 로딩 */
+  /* 2. tab and loading */
   const bar = document.createElement("div");
   bar.className = "aas-tabbar";
 
@@ -61,7 +84,7 @@
   tH.onclick=()=>{activateTab(tH);};
   tA.onclick=()=>{activateTab(tA);};
 
-  /* 3. 색상 함수 */
+  /* 3. Color select function */
   function styleProb(prob, el){
     if(prob<=20){el.style.background="green";el.style.color="#000";}
     else if(prob<=40){el.style.background="#85cc00";el.style.color="#000";}
@@ -73,7 +96,7 @@
     el.style.background="#888";el.style.color="#fff";
   }
 
-  /* 4. 카드 수집 */
+  /* 4. Card collecting in google */
   function collect(){
     return Array.from(document.querySelectorAll("#search .g, #search .MjjYud"))
       .filter(c=>!c.classList.contains("aas-card"))
@@ -87,7 +110,7 @@
       }).filter(Boolean);
   }
 
-  /* 5. BG 메시지 */
+  /* 5. BG Message for debug */
   const bg=(links)=>new Promise(res=>{
     chrome.runtime.sendMessage({type:"CHECK_AI",links},r=>res(r));
   });
@@ -99,6 +122,9 @@
     const batch=collect(); if(!batch.length) return;
     busy=true; loading.style.display="block";
 
+    const settingsPromise = loadSettings(); 
+
+    
     const uniq=[...new Set(batch.map(i=>i.url))];
     const rep=await bg(uniq).catch(e=>({ok:false,error:e}));
     if(!(rep?.ok&&rep.data?.results)){console.error("[AAS] bg fail",rep);busy=false;loading.style.display="none";return;}
@@ -108,7 +134,7 @@
       if(typeof r.ai_probability==="number")
         probMap[r.url]=(r.ai_probability*100).toFixed(2);
       else
-        errMap[r.url]=r.ai_probability;   // "크롤링 실패" 등
+        errMap[r.url]=r.ai_probability;   // "Crwal failed" and other errors
     });
 
     const errCards=[];
@@ -117,12 +143,16 @@
       badge.className="ai-badge";
       card.style.position ||= "relative";
       card.style.paddingBottom="26px";
+      settingsPromise.then(s => {
+      window.__aasSettings = s;
+      console.log("[AAS] Settings loaded:", s);
 
+      const aiJudge = s.aiJudge ?? defaultSettings.aiJudge;
       if(url in probMap){
         const pct=probMap[url];
         badge.textContent=`AI 확률 : ${pct}%`;
         styleProb(Number(pct),badge);
-        card.classList.add(Number(pct)>=60?"aas-ai":"aas-human");
+        card.classList.add(Number(pct)>=aiJudge?"aas-ai":"aas-human");
       }else{
         const msg=errMap[url]||"오류";
         badge.textContent=msg;
@@ -131,13 +161,15 @@
         errCards.push(card);
       }
       card.appendChild(badge);
+      });
+      
     });
 
     loading.style.display="none";
     busy=false;
   }
 
-  /* 8. 초기 + Mutation */
+  /* 8. initialize + Mutation */
   setTimeout(annotate,800);
   new MutationObserver(()=>annotate()).observe(search||document.body,{childList:true,subtree:true});
 })();
