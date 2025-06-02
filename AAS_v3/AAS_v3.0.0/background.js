@@ -16,3 +16,5 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // “비동기 응답”을 알리기 위해 true 반환
     return true;
 });
+
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
