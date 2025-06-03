@@ -1,58 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chrome Extension Side Panel</title>
+  <title>AAS Side Panel</title>
   <link rel="stylesheet" href="../statics/css/sidepanel.css">
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align: center;">AAS AI killer</h1>
+    <h1>AI 분석 도구</h1>
     
-    <div id="fileCard" class="card">
-      <div class="card-header">
-        <input type="radio" id="fileOption" name="inputType" class="radio-input" checked>
-        <label for="fileOption" class="card-title">파일 업로드</label>
-      </div>
-      <div class="file-input-container">
-        <label for="fileInput" class="file-input-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          파일 선택
-        </label>
-        <input type="file" id="fileInput" class="file-input">
-        
-        <!-- 드래그 앤 드롭 영역 추가 -->
-        <div id="dropZone" class="drop-zone">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          <div class="drop-zone-text">파일을 여기에 끌어다 놓으세요</div>
+    <!-- 탭 네비게이션 -->
+    <div class="tabs">
+      <button class="tab active" data-tab="file">파일 업로드</button>
+      <button class="tab" data-tab="text">텍스트 입력</button>
+    </div>
+
+    <!-- 파일 업로드 탭 -->
+    <div id="fileTab" class="tab-content active">
+      <div class="card">
+        <div class="file-input-container">
+          <label for="fileInput" class="file-input-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            파일 선택
+          </label>
+          <input type="file" id="fileInput" class="file-input">
+          
+          <div id="dropZone" class="drop-zone">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div class="drop-zone-text">파일을 여기에 끌어다 놓으세요</div>
+            <div class="drop-zone-subtext">또는 위의 버튼을 클릭하여 파일을 선택하세요</div>
+          </div>
+          
+          <div id="fileName" class="file-name" style="display: none;"></div>
+          <p class="info-text">지원 파일 형식: PDF</p>
         </div>
         
-        <div id="fileName" class="file-name"></div>
-        <p class="info-text">지원 파일 형식: PDF</p>
+        <button id="fileSubmitButton" class="submit-button" disabled>분석 시작</button>
       </div>
     </div>
-    
-    <div id="textCard" class="card disabled">
-      <div class="card-header">
-        <input type="radio" id="textOption" name="inputType" class="radio-input">
-        <label for="textOption" class="card-title">텍스트 입력</label>
+
+    <!-- 텍스트 입력 탭 -->
+    <div id="textTab" class="tab-content inactive">
+      <div class="card">
+        <div class="text-input-container">
+          <textarea id="textInput" class="text-input" placeholder="분석할 텍스트를 입력하세요... (최소 200자 이상)"></textarea>
+          <div id="charCount" class="char-count invalid">0 / 200자 (최소 200자 필요)</div>
+          <p class="info-text">정확한 분석을 위해 충분한 양의 텍스트를 입력해주세요.</p>
+        </div>
+        
+        <button id="textSubmitButton" class="submit-button" disabled>분석 시작</button>
       </div>
-      <textarea id="textInput" class="text-input" placeholder="여기에 텍스트를 입력하세요..." disabled></textarea>
-      <div id="textError" class="error-message">텍스트는 최소 200자 이상이어야 합니다.</div>
     </div>
-    
-    <button id="submitButton" class="submit-button" disabled>전송</button>
+
+    <!-- 결과 표시 영역 -->
+    <div class="result-section">
+      <h2 class="result-title">분석 결과</h2>
+      <div class="result-card">
+        <div class="ai-probability" id="result">00%</div>
+        <div class="ai-label">AI 확률</div>
+      </div>
+    </div>
   </div>
 
-  <script src="../statics/js/sidepanel.js"></script>
+  <script src = "../statics/js/sidepanel.js"></script>
 </body>
 </html>
