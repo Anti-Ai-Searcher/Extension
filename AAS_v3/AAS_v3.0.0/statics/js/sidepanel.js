@@ -111,16 +111,10 @@ fileSubmitButton.addEventListener('click', function () {
 
   const file = fileInput.files[0];
 
-  // PDF 형식 확인
-  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-    document.getElementById('result').textContent = 'PDF 파일만 업로드할 수 있습니다.';
-    return;
-  }
-
   const formData = new FormData();
   formData.append('upload', file);  // 백엔드에서 'upload'라는 필드로 받는다고 가정
 
-  fetch('http://localhost:8000/check_pdf', {
+  fetch('http://localhost:8000/check_file', {
     method: 'POST',
     body: formData,
   })
