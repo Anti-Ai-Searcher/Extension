@@ -1,153 +1,127 @@
+// == Anti-AI-Searcher : contentScript (final with error handling) ==
 (function () {
-  // 이미 UI가 있으면 중단
-  if (document.querySelector(".my-ext-container")) {
-    return;
+  if (window.__aasInjected) return;
+  window.__aasInjected = true;
+
+  /* 1. CSS */
+  const st = document.createElement("style");
+  st.textContent = `
+    .aas-tabbar{display:flex;width:100%;border:1px solid #dadce0;border-radius:4px;
+      overflow:hidden;margin:12px 0;font-family:Arial,Helvetica,sans-serif}
+    .aas-tab{flex:1;padding:8px 0;background:#f1f3f4;color:#555;text-align:center;
+      font-size:14px;font-weight:500;cursor:pointer;border-right:1px solid #dadce0}
+    .aas-tab:last-child{border-right:none}.aas-tab.active{background:#fff;color:#1a73e8;font-weight:600}
+    .aas-loading{margin:8px 0;font-size:14px;color:#555;font-family:Arial,Helvetica,sans-serif}
+    body.aas-show-human .aas-card.aas-ai{display:none!important}
+    body.aas-show-ai    .aas-card.aas-human{display:none!important}
+    .ai-badge{position:absolute;right:8px;bottom:8px;padding:2px 6px;border-radius:4px;
+      font-size:12px;font-weight:600;z-index:50}
+  `;
+  document.head.appendChild(st);
+
+  /* 2. 탭 & 로딩 */
+  const bar = document.createElement("div");
+  bar.className = "aas-tabbar";
+  const tH = Object.assign(document.createElement("div"), {className:"aas-tab active",textContent:"Human Links"});
+  const tA = Object.assign(document.createElement("div"), {className:"aas-tab",textContent:"AI Links"});
+  bar.append(tH,tA);
+  const loading = Object.assign(document.createElement("div"),{className:"aas-loading",textContent:"검색 결과를 분석 중입니다..."});
+  loading.style.display="none";
+
+  const search = document.getElementById("search");
+  const parent = search?.parentElement||document.body;
+  parent.insertBefore(loading, search);
+  parent.insertBefore(bar, search);
+
+  document.body.classList.add("aas-show-human");
+  tH.onclick=()=>{tH.classList.add("active");tA.classList.remove("active");
+    document.body.classList.add("aas-show-human");document.body.classList.remove("aas-show-ai");};
+  tA.onclick=()=>{tA.classList.add("active");tH.classList.remove("active");
+    document.body.classList.add("aas-show-ai");document.body.classList.remove("aas-show-human");};
+
+  /* 3. 색상 함수 */
+  function styleProb(prob, el){
+    if(prob<=20){el.style.background="green";el.style.color="#000";}
+    else if(prob<=40){el.style.background="#85cc00";el.style.color="#000";}
+    else if(prob<=60){el.style.background="yellow";el.style.color="#000";}
+    else if(prob<=80){el.style.background="orange";el.style.color="#000";}
+    else{el.style.background="red";el.style.color="#fff";}
+  }
+  function styleError(el){
+    el.style.background="#888";el.style.color="#fff";
   }
 
-  const searchArea = document.getElementById("search");
-  if (!searchArea) {
-    console.log("[Extension] 구글 검색 영역(#search)을 찾지 못했습니다.");
-    return;
+  /* 4. 카드 수집 */
+  function collect(){
+    return Array.from(document.querySelectorAll("#search .g, #search .MjjYud"))
+      .filter(c=>!c.classList.contains("aas-card"))
+      .map(card=>{
+        const a=card.querySelector("a[href]");
+        if(!a) return null;
+        const url=a.href;
+        if(!url||url.includes("google")) return null;
+        card.classList.add("aas-card");
+        return{card,url};
+      }).filter(Boolean);
   }
 
-  // 1) 최상단 컨테이너
-  const extContainer = document.createElement("div");
-  extContainer.className = "my-ext-container";
-
-  // 2) 상단 헤더
-  const header = document.createElement("div");
-  header.className = "my-ext-header";
-
-  const title = document.createElement("div");
-  title.className = "my-ext-title";
-  title.textContent = "Anti-AI-Searcher";
-
-  // 전체 다운로드 버튼
-  const downloadAllBtn = document.createElement("button");
-  downloadAllBtn.className = "my-ext-button";
-  downloadAllBtn.textContent = "전체 링크 다운로드";
-
-  header.appendChild(title);
-  header.appendChild(downloadAllBtn);
-
-  // 3) 좌/우 칼럼 래퍼
-  const columnsWrapper = document.createElement("div");
-  columnsWrapper.className = "my-ext-columns";
-
-  // 좌측 칼럼
-  const leftCol = document.createElement("div");
-  leftCol.className = "my-ext-column";
-
-  const leftColHeader = document.createElement("div");
-  leftColHeader.className = "my-ext-col-header";
-
-  const leftTitle = document.createElement("div");
-  leftTitle.className = "my-ext-col-title";
-  leftTitle.textContent = "AI Links";
-
-  const downloadLeftBtn = document.createElement("button");
-  downloadLeftBtn.className = "my-ext-button";
-  downloadLeftBtn.textContent = "다운로드";
-
-  leftColHeader.appendChild(leftTitle);
-  leftColHeader.appendChild(downloadLeftBtn);
-  leftCol.appendChild(leftColHeader);
-
-  // 우측 칼럼
-  const rightCol = document.createElement("div");
-  rightCol.className = "my-ext-column";
-
-  const rightColHeader = document.createElement("div");
-  rightColHeader.className = "my-ext-col-header";
-
-  const rightTitle = document.createElement("div");
-  rightTitle.className = "my-ext-col-title";
-  rightTitle.textContent = "Human Links";
-
-  const downloadRightBtn = document.createElement("button");
-  downloadRightBtn.className = "my-ext-button";
-  downloadRightBtn.textContent = "다운로드";
-
-  rightColHeader.appendChild(rightTitle);
-  rightColHeader.appendChild(downloadRightBtn);
-  rightCol.appendChild(rightColHeader);
-
-  // 4) 래퍼에 좌/우 칼럼 삽입
-  columnsWrapper.appendChild(leftCol);
-  columnsWrapper.appendChild(rightCol);
-
-  // 컨테이너에 헤더, 칼럼 래퍼 삽입
-  extContainer.appendChild(header);
-  extContainer.appendChild(columnsWrapper);
-
-  // 5) 구글 검색 영역 최상단에 삽입
-  searchArea.insertAdjacentElement("afterbegin", extContainer);
-
-  // 6) 모든 a 태그를 수집 -> 필터 -> 짝수/홀수 분류
-  const allAnchorTags = Array.from(document.querySelectorAll("a"));
-  // 6-1) href 추출
-  let allLinks = allAnchorTags.map((a) => a.href).filter((href) => href);
-
-  // 6-2) "google" 단어가 들어간 url은 제외
-  //      대소문자 구분 없이 처리: toLowerCase() 후 "google" 포함 검사
-  allLinks = allLinks.filter((link) => !link.toLowerCase().includes("google"));
-
-  // 7) 짝수 인덱스 -> AI, 홀수 인덱스 -> Human
-  const aiLinks = [];
-  const humanLinks = [];
-  allLinks.forEach((link, idx) => {
-    if (idx % 2 === 0) {
-      aiLinks.push(link);
-    } else {
-      humanLinks.push(link);
-    }
+  /* 5. BG 메시지 */
+  const bg=(links)=>new Promise(res=>{
+    chrome.runtime.sendMessage({type:"CHECK_AI",links},r=>res(r));
   });
 
-  // 8) UI에 링크 표시 (하이퍼링크로 표시)
-  function appendLinksToColumn(links, col) {
-    links.forEach((l) => {
-      // 링크 박스
-      const linkBox = document.createElement("div");
-      linkBox.className = "my-ext-link";
+  /* 6. annotate */
+  let busy=false;
+  async function annotate(){
+    if(busy) return;
+    const batch=collect(); if(!batch.length) return;
+    busy=true; loading.style.display="block";
 
-      // 실제 하이퍼링크 (누르면 이동)
-      const anchor = document.createElement("a");
-      anchor.href = l;
-      anchor.target = "_blank"; // 새 탭에서 열기
-      anchor.innerText = l; // 보여주는 텍스트
-      anchor.className = "my-link-anchor"; // CSS 호버 스타일을 위해
+    const uniq=[...new Set(batch.map(i=>i.url))];
+    const rep=await bg(uniq).catch(e=>({ok:false,error:e}));
+    if(!(rep?.ok&&rep.data?.results)){console.error("[AAS] bg fail",rep);busy=false;loading.style.display="none";return;}
 
-      linkBox.appendChild(anchor);
-      col.appendChild(linkBox);
+    const probMap={}, errMap={};
+    rep.data.results.forEach(r=>{
+      if(typeof r.ai_probability==="number")
+        probMap[r.url]=(r.ai_probability*100).toFixed(2);
+      else
+        errMap[r.url]=r.ai_probability;   // "크롤링 실패" 등
     });
+
+    const errCards=[];
+    batch.forEach(({card,url})=>{
+      let badge=document.createElement("span");
+      badge.className="ai-badge";
+      card.style.position ||= "relative";
+      card.style.paddingBottom="26px";
+
+      if(url in probMap){
+        const pct=probMap[url];
+        badge.textContent=`AI 확률 : ${pct}%`;
+        styleProb(Number(pct),badge);
+        card.classList.add(Number(pct)>=60?"aas-ai":"aas-human");
+      }else{
+        const msg=errMap[url]||"오류";
+        badge.textContent=msg;
+        styleError(badge);
+        card.classList.add("aas-error");
+        errCards.push(card);
+      }
+      card.appendChild(badge);
+    });
+
+    /* 7. 오류 카드 뒤로 밀기 */
+    if(errCards.length){
+      const container=search||document.body;
+      errCards.forEach(c=>container.appendChild(c));
+    }
+
+    loading.style.display="none";
+    busy=false;
   }
 
-  appendLinksToColumn(aiLinks, leftCol);
-  appendLinksToColumn(humanLinks, rightCol);
-
-  // 9) 다운로드 헬퍼
-  function downloadJSON(filename, dataArr) {
-    // dataArr에는 이미 google 제외된 링크가 들어 있음
-    const dataStr = JSON.stringify(dataArr, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  // 10) 다운로드 버튼 이벤트
-  downloadAllBtn.addEventListener("click", () => {
-    downloadJSON("allLinks.json", allLinks);
-  });
-  downloadLeftBtn.addEventListener("click", () => {
-    downloadJSON("aiLinks.json", aiLinks);
-  });
-  downloadRightBtn.addEventListener("click", () => {
-    downloadJSON("humanLinks.json", humanLinks);
-  });
+  /* 8. 초기 + Mutation */
+  setTimeout(annotate,800);
+  new MutationObserver(()=>annotate()).observe(search||document.body,{childList:true,subtree:true});
 })();

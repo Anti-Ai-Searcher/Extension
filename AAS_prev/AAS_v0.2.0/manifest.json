@@ -1,10 +1,12 @@
 {
   "name": "Anti-AI-Searcher",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "manifest_version": 3,
-  "description": "Google 검색 결과를 AI로 분석하고, 검색 페이지에 AI / Human 탭으로 분류 + 확률 시각화 제공",
+
+  "description": "Google 검색 결과를 AI로 분석하여 검색 페이지에 AI 스니펫처럼 UI를 제공하고, 좌/우 링크 분류 및 다운로드 기능을 제공합니다.",
   "permissions": ["storage", "scripting"],
   "host_permissions": ["*://www.google.com/*"],
+
   "content_scripts": [
     {
       "matches": ["*://www.google.com/search*"],
@@ -12,6 +14,7 @@
       "css": ["style.css"]
     }
   ],
+
   "icons": {
     "16": "images/AAS_icon-16.png",
     "32": "images/AAS_icon-32.png",

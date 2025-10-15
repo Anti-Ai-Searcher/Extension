@@ -1,0 +1,43 @@
+{
+    "name": "Anti-AI-Searcher",
+    "description": "Detect and separate AI-generated and human-generated links in search results.",
+    "version": "0.1.0",
+    "manifest_version": 3,
+  
+    "permissions": [
+      "storage",
+      "scripting"
+    ],
+  
+    "host_permissions": [
+      "*://www.google.com/*",
+      "*://search.naver.com/*"
+    ],
+  
+    "icons": {
+      "16": "images/icon-16.png",
+      "32": "images/icon-32.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    },
+  
+    "action": {
+      "default_popup": "main.html"
+    },
+  
+    "background": {
+      "service_worker": "background.js"
+    },
+  
+    "content_scripts": [
+      {
+        "matches": [
+          "*://www.google.com/search*",
+          "*://search.naver.com/search*"
+        ],
+        "js": ["contentScript.js"],
+        "css": ["style.css"]
+      }
+    ]
+  }
+  

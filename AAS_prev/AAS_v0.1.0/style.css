@@ -1,0 +1,151 @@
+/* 확장 프로그램 전체 영역 */
+#extension-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50vh; /* 초기 높이: 화면의 절반 정도 */
+    z-index: 999999;
+    background-color: #f0f0f0; /* 회색 배경 */
+    border-top: 2px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', sans-serif;
+    color: #000;  /* 글씨색을 검은색으로 */
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    overflow: hidden; /* 내부 스크롤 영역을 위해서 숨김 */
+    border-radius: 4px 4px 0 0;
+  }
+  
+  /* 상단 영역: 여유 있게 확장 */
+  #extension-top {
+    flex: 0 0 auto;
+    height: 50px;
+    padding: 16px;
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: lightslategray;  /* 상단 배경색 */
+    color: #fff;  /* 글씨색을 흰색으로 */
+  }
+
+  .top-line1 {
+    font-size: 24px;  /* 첫 번째 줄 폰트 크기 */
+    font-weight: bold;
+    margin: 4px 0;
+  }
+  
+  .top-line2 {
+    font-size: 18px;  /* 두 번째 줄 폰트 크기 */
+    margin: 4px 0;
+  }
+  
+  /* 드래그 핸들 (resizer) - UI의 제일 위쪽에 위치 */
+  #extension-resizer {
+    flex: 0 0 auto;
+    height: 4px;
+    cursor: row-resize;
+    background-color: #ddd;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  /* 하단 영역: 좌우 탭 */
+  #extension-bottom {
+    flex: 1 1 auto;
+    display: flex;
+    min-height: 0;
+  }
+  
+  /* 좌측/우측 탭 스타일 */
+  #extension-left,
+  #extension-right {
+    position: relative;
+    width: 50%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid #ccc;
+    padding: 8px;
+  }
+  
+  #extension-right {
+    border-right: none;
+  }
+  
+  /* 헤더 컨테이너: 제목과 다운로드 버튼을 한 줄에 배치 */
+  .extension-tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;  /* 필요에 따라 패딩 조정 */
+    margin-bottom: 8px;
+  }
+  
+  .extension-tab-title {
+    font-weight: bold;
+    font-size: 20px;
+    /* margin-bottom: 8px; */
+  }
+  
+  /* 각 링크를 감싸는 박스 */
+  .extension-link {
+    margin-bottom: 6px;
+    padding: 4px;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    word-wrap: break-word;
+  }
+  
+  /* 다운로드 버튼 스타일 */
+  .download-btn {
+    padding: 6px 10px;
+    background-color: #6c757d; /* 회색 계열 */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .download-btn:hover {
+    background-color: lightgreen;
+    color: #000;
+  }
+  
+  /* main.html용 (옵션) */
+  body {
+    margin: 16px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  button {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  button:hover {
+    background-color: #ddd;
+  }
+  
+  #jsonContainer {
+    margin-top: 20px;
+    background-color: #f7f7f7;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  #savedLinks {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  

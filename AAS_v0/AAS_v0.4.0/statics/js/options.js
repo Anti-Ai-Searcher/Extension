@@ -81,4 +81,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('saveBtn').addEventListener('click', saveSettings);
     document.getElementById('resetBtn').addEventListener('click', resetSettings);
-});  
+});
+
+// 문서의 모든 HTML 요소가 로드된 후 스크립트를 실행합니다.
+document.addEventListener('DOMContentLoaded', function() {
+    // Chrome Extension API를 사용해 manifest.json 파일의 정보를 객체 형태로 가져옵니다.
+    const manifest = chrome.runtime.getManifest();
+    
+    // manifest 객체에서 'version' 키의 값을 가져옵니다.
+    const version = manifest.version;
+    
+    // HTML에서 id가 'version-display'인 요소를 찾습니다.
+    const versionElement = document.getElementById('version-display');
+    
+    // 찾은 요소의 텍스트 내용을 'AAS v[버전]' 형식으로 설정합니다.
+    if (versionElement) {
+        versionElement.textContent = `AAS v${version}`;
+    }
+});

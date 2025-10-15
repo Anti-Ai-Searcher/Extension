@@ -1,151 +1,141 @@
-/* 확장 프로그램 전체 영역 */
-#extension-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50vh; /* 초기 높이: 화면의 절반 정도 */
-    z-index: 999999;
-    background-color: #f0f0f0; /* 회색 배경 */
-    border-top: 2px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    font-family: 'Segoe UI', sans-serif;
-    color: #000;  /* 글씨색을 검은색으로 */
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-    overflow: hidden; /* 내부 스크롤 영역을 위해서 숨김 */
-    border-radius: 4px 4px 0 0;
-  }
-  
-  /* 상단 영역: 여유 있게 확장 */
-  #extension-top {
-    flex: 0 0 auto;
-    height: 50px;
-    padding: 16px;
-    overflow: hidden;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background-color: lightslategray;  /* 상단 배경색 */
-    color: #fff;  /* 글씨색을 흰색으로 */
-  }
+.my-ext-container {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  background-color: #fff;
+  color: #202124;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  padding: 12px;
+}
 
-  .top-line1 {
-    font-size: 24px;  /* 첫 번째 줄 폰트 크기 */
-    font-weight: bold;
-    margin: 4px 0;
+.my-ext-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.my-ext-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.my-ext-tabs {
+  display: flex;
+  border-bottom: 1px solid #dadce0;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.my-ext-tab-button {
+  flex: 1;
+  padding: 8px;
+  background-color: #f1f3f4;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #202124;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.my-ext-tab-button:not(:last-child) {
+  border-right: 1px solid #dadce0;
+}
+
+.my-ext-tab-button.active {
+  background-color: #ffffff;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.my-ext-tab-button:hover {
+  background-color: #e8eaed;
+}
+
+.my-ext-content-area {
+  padding-top: 8px;
+}
+
+.my-ext-tab-content {
+  display: none;
+}
+
+.my-ext-tab-content.active {
+  display: block;
+}
+
+/* ======================
+   링크 박스 (좌우 2분할)
+====================== */
+.my-ext-link {
+  display: flex;
+  align-items: center;
+  background-color: #f1f3f4;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #202124;
+  padding: 6px;
+}
+
+.my-ext-link:hover {
+  background-color: #e8eaed;
+}
+
+/* 왼쪽: 링크 부분 (한 줄 + 수평 스크롤) */
+.link-left {
+  flex: 1 1 auto;        /* 남은 공간 사용 */
+  overflow-x: auto;      /* 너무 길면 가로 스크롤 */
+  white-space: nowrap;   /* 한 줄로 유지 */
+  margin-right: 10px;    /* 오른쪽 여백 */
+}
+
+/* 실제 링크 a */
+.my-link-anchor {
+  text-decoration: none;
+  color: #202124;
+}
+.my-link-anchor:hover {
+  text-decoration: underline;
+}
+
+/* 오른쪽: 확률 박스 (고정 폭) */
+.link-right {
+  flex: 0 0 auto;       /* 너비 고정 or 내용 길이에 맞춤 */
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* 다크 모드 */
+@media (prefers-color-scheme: dark) {
+  .my-ext-container {
+    background-color: #202124;
+    color: #e8eaed;
+    border-color: #5f6368;
   }
-  
-  .top-line2 {
-    font-size: 18px;  /* 두 번째 줄 폰트 크기 */
-    margin: 4px 0;
+  .my-ext-title {
+    color: #e8eaed;
   }
-  
-  /* 드래그 핸들 (resizer) - UI의 제일 위쪽에 위치 */
-  #extension-resizer {
-    flex: 0 0 auto;
-    height: 4px;
-    cursor: row-resize;
-    background-color: #ddd;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+  .my-ext-link {
+    background-color: #303134;
+    border-color: #5f6368;
+    color: #e8eaed;
   }
-  
-  /* 하단 영역: 좌우 탭 */
-  #extension-bottom {
-    flex: 1 1 auto;
-    display: flex;
-    min-height: 0;
+  .my-ext-link:hover {
+    background-color: #44464a;
   }
-  
-  /* 좌측/우측 탭 스타일 */
-  #extension-left,
-  #extension-right {
-    position: relative;
-    width: 50%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-right: 1px solid #ccc;
-    padding: 8px;
+  .my-link-anchor {
+    color: #e8eaed;
   }
-  
-  #extension-right {
-    border-right: none;
-  }
-  
-  /* 헤더 컨테이너: 제목과 다운로드 버튼을 한 줄에 배치 */
-  .extension-tab-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;  /* 필요에 따라 패딩 조정 */
-    margin-bottom: 8px;
-  }
-  
-  .extension-tab-title {
-    font-weight: bold;
-    font-size: 20px;
-    /* margin-bottom: 8px; */
-  }
-  
-  /* 각 링크를 감싸는 박스 */
-  .extension-link {
-    margin-bottom: 6px;
-    padding: 4px;
-    background-color: #fafafa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    word-wrap: break-word;
-  }
-  
-  /* 다운로드 버튼 스타일 */
-  .download-btn {
-    padding: 6px 10px;
-    background-color: #6c757d; /* 회색 계열 */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .download-btn:hover {
-    background-color: lightgreen;
-    color: #000;
-  }
-  
-  /* main.html용 (옵션) */
-  body {
-    margin: 16px;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  button {
-    cursor: pointer;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    background-color: #eee;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  
-  button:hover {
-    background-color: #ddd;
-  }
-  
-  #jsonContainer {
-    margin-top: 20px;
-    background-color: #f7f7f7;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  #savedLinks {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  
+}
