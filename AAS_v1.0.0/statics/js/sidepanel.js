@@ -105,6 +105,21 @@ function handleDrop(e) {
     }
 }
 
+// [헬퍼 함수] 0~1 사이의 값을 퍼센트 문자열로 변환
+function formatToPercentage(raw) {
+    let prob;
+    if (typeof raw === "string") prob = parseFloat(raw);
+    else if (typeof raw === "number") prob = raw;
+    else prob = 0;
+    
+    if (isNaN(prob)) prob = 0; // NaN 방지
+
+    // 0~1 값을 0~100 사이의 정수형 백분율로 변환
+    const percentage = (prob * 100).toFixed(0);
+    return `${percentage}%`;
+}
+
+
 // 제출 버튼 클릭 시
 fileSubmitButton.addEventListener('click', function () {
   if (fileInput.files.length === 0) return;
@@ -113,6 +128,9 @@ fileSubmitButton.addEventListener('click', function () {
 
   const formData = new FormData();
   formData.append('upload', file);  // 백엔드에서 'upload'라는 필드로 받는다고 가정
+
+  // 분석 시작 시 로딩 표시 (선택 사항)
+  document.getElementById('result').textContent = '...';
 
   fetch('http://localhost:8000/check_file', {
     method: 'POST',
@@ -123,11 +141,12 @@ fileSubmitButton.addEventListener('click', function () {
       return response.json();  // 서버가 JSON 응답할 경우
     })
     .then(data => {
-      document.getElementById('result').textContent = data.result;
+      // ⭐️ [수정됨] 백분율로 변환하여 표시
+      document.getElementById('result').textContent = formatToPercentage(data.result);
     })
     .catch(error => {
       console.error('에러 발생:', error);
-      document.getElementById('result').textContent = `에러 발생: ${error.message}`;
+      document.getElementById('result').textContent = `에러`;
     });
 });
 
@@ -135,6 +154,10 @@ fileSubmitButton.addEventListener('click', function () {
 textSubmitButton.addEventListener('click', function () {
   const text = textInput.value;
   if (text.length >= 200) {
+
+    // 분석 시작 시 로딩 표시 (선택 사항)
+    document.getElementById('result').textContent = '...';
+
     fetch('http://localhost:8000/check_str', {
       method: 'POST',
       headers: {
@@ -144,10 +167,13 @@ textSubmitButton.addEventListener('click', function () {
     })
       .then(response => response.json())
       .then(data => {
-        document.getElementById('result').textContent = data.result;
+        // ⭐️ [수정됨] 백분율로 변환하여 표시
+        document.getElementById('result').textContent = formatToPercentage(data.result);
       })
       .catch(error => {
         console.error('에러 발생:', error);
+        // ⭐️ [개선됨] 에러 발생 시 UI에 표시
+        document.getElementById('result').textContent = '에러';
       });
   }
 });
